@@ -6,6 +6,7 @@
 #define BINARY_SEARCH_TREE_BST_NODE_HPP
 
 #include <memory>
+#include <utility>
 
 /**
  * Node of a binary search tree
@@ -14,21 +15,26 @@
  * @tparam TValue value type
  */
 template<typename TKey, typename TValue>
-class BSTNode {
+class BSTNode : public std::enable_shared_from_this<BSTNode<TKey, TValue>> {
 public:
     using NodeType = BSTNode<TKey, TValue>;
+    using NodePtr = std::shared_ptr<NodeType>;
 
     BSTNode(TKey key, TValue value) :
             key_(key), value_(value) {}
 
     /**
      * Inserts new_node to the appropriate descendant leaf,
-     * if the tree does not already contain a node with the same key
+     * if the tree does not already contain a node with the same key.
      *
-     * @param new_node Node to insert
-     * @return true if the new node was inserted into the appropriate descendant leaf, false otherwise
+     * @param new_node Node to insert.
+     * @return a pair consisting of an pointer and a boolean. The pointer points:
+     *  - To the inserted element if the insertion took place.
+     *  - To the element that prevented the insertion if tree already contains a node with the same key.
+     *  - Nullptr if new_node is nullptr.
+     *  The boolean is true if the new node was successfully inserted, false otherwise.
      */
-    bool Insert(std::unique_ptr<NodeType> &&new_node);
+    std::pair<NodePtr, bool> Insert(NodePtr new_node);
 
     TKey Key() {
         return key_;
@@ -42,30 +48,32 @@ private:
     TKey key_;
     TValue value_;
 
-    std::unique_ptr<NodeType> left_;
-    std::unique_ptr<NodeType> right_;
+    NodePtr left_;
+    NodePtr right_;
 };
 
-bool BSTNode<TKey, TValue>::Insert(std::unique_ptr<NodeType> &&new_node) {
+template<typename TKey, typename TValue>
+std::pair<typename BSTNode<TKey, TValue>::NodePtr, bool>
+BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
     if (!new_node) {
-        return false;
+        return {nullptr, false};
     }
 
     if(new_node->Key() == key_) {
-        return false;
+        return {this->shared_from_this(), false};
     }
 
     if (new_node->Key() < key_) {
         if (!left_) {
             left_.swap(new_node);
-            return true;
+            return {left_, true};
         }
         return left_->Insert(std::move(new_node));
     }
 
     if(!right_) {
         right_.swap(new_node);
-        return true;
+        return {right_, true};
     }
     return right_->Insert(std::move(new_node));
 }
