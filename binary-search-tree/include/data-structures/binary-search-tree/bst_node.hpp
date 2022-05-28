@@ -58,11 +58,11 @@ public:
      */
     NodePtr Remove(TKey key);
 
-    TKey Key() {
+    TKey Key() const {
         return key_;
     }
 
-    TValue Value() {
+    TValue Value() const {
         return value_;
     }
 
