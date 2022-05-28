@@ -148,6 +148,29 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Find(TKey key) {
 }
 
 template<typename TKey, typename TValue>
+std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TValue>::FindParent(TKey key) {
+    if (!left_ && !right_) {
+        return {nullptr, Direction{}};
+    }
+    if (left_ && key < key_) {
+        if (left_->Key() == key) {
+            return {this->shared_from_this(), Direction::kLeft};
+        }
+        auto found_left = left_->FindParent(key);
+        if (found_left.first) {
+            return found_left;
+        }
+    }
+    if (right_ && key > key_) {
+        if (right_->Key() == key) {
+            return {this->shared_from_this(), Direction::kRight};
+        }
+        return right_->FindParent(key);
+    }
+    return {nullptr, Direction{}};
+}
+
+template<typename TKey, typename TValue>
 typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) {
     const auto parent_and_direction = FindParent(key);
     if (!parent_and_direction.first) {
@@ -169,12 +192,6 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direct
     Insert(removed_node->Disconnect(Direction::kRight));
 
     return removed_node;
-}
-
-template<typename TKey, typename TValue>
-std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TValue>::FindParent(TKey key) {
-    // TODO: Implement
-    return {nullptr, Direction::kLeft};
 }
 
 template<typename TKey, typename TValue>
