@@ -9,6 +9,11 @@
 #include <utility>
 
 /**
+ * Direction of a descendant of a binary tree node.
+ */
+enum class Direction : bool {kLeft, kRight};
+
+/**
  * Node of a binary search tree
  *
  * @tparam TKey key type
@@ -44,6 +49,15 @@ public:
      */
     NodePtr Find(TKey key);
 
+    /**
+     * Searches for the node with the given key among the descendants of this node
+     * and removes it from the tree if found.
+     *
+     * @param key Key for which the node is to be removed.
+     * @return Pointer to the removed node.
+     */
+    NodePtr Remove(TKey key);
+
     TKey Key() {
         return key_;
     }
@@ -52,7 +66,25 @@ public:
         return value_;
     }
 
+    /**
+     * Removes the direct descendant node in the given direction and reconnects any descendants of the removed node.
+     *
+     * @param direction Indicates whether the left or the right direct descendant is to be removed.
+     * @return Pointer to the removed node, or nullptr if the descendant is not present;
+     */
+    NodePtr RemoveNext(Direction direction);
+
 private:
+    /**
+     * Searches for the Node that is parent of the Node with the given key.
+     *
+     * @param key Key for which the parent node is to be returned.
+     * @return Pair consisting of:
+     *  - NodePtr pointing to the parent node of the Node with the given key, or nullptr if the key was not found,
+     *  - Direction of the descendant with the given key.
+     */
+    std::pair<NodePtr, Direction> FindParent(TKey key);
+
     TKey key_;
     TValue value_;
 
@@ -102,6 +134,28 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Find(TKey key) {
     }
 
     return left_ ? left_->Find(key) : nullptr;
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) {
+    const auto parent_and_direction = FindParent(key);
+    if (!parent_and_direction.first) {
+        return nullptr;
+    }
+
+    return parent_and_direction.first->RemoveNext(parent_and_direction.second);
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direction /*direction*/) {
+    // TODO: Implement
+    return BSTNode::NodePtr();
+}
+
+template<typename TKey, typename TValue>
+std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TValue>::FindParent(TKey key) {
+    // TODO: Implement
+    return {nullptr, Direction::kLeft};
 }
 
 #endif //BINARY_SEARCH_TREE_BST_NODE_HPP

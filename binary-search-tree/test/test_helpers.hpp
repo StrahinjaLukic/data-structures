@@ -4,11 +4,12 @@
 
 #include <data-structures/binary-search-tree/bst_node.hpp>
 
-#include <map>
+#include <vector>
+#include <utility>
 
 template<typename TKey, typename TValue>
 typename BSTNode<TKey, TValue>::NodePtr
-MakeTree(const std::map<TKey, TValue> &key_values) {
+MakeTree(const std::vector<std::pair<TKey, TValue>> &key_values) {
     if (key_values.empty()) {
         return nullptr;
     }

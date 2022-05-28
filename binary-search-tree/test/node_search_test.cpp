@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
-#include <map>
+#include <vector>
 
 TEST(NodeSearchTest, FindSelf) {
     using Node = BSTNode<int, std::string>;
@@ -25,7 +25,7 @@ TEST(NodeSearchTest, FindSelf) {
 TEST(NodeSearchTest, FindExistingNodes) {
     using Node = BSTNode<int, std::string>;
 
-    const std::map<int, std::string> input = {
+    const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
             {1,  "right"},
@@ -45,7 +45,7 @@ TEST(NodeSearchTest, FindExistingNodes) {
 TEST(NodeSearchTest, FindMissingNodes) {
     using Node = BSTNode<int, std::string>;
 
-    const std::map<int, std::string> input = {
+    const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
             {1,  "right"},

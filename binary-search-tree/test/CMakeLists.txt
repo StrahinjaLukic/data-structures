@@ -1,4 +1,5 @@
 add_executable(${PROJECT_NAME}_unittest
+    node_deletion_test.cpp
     node_insertion_test.cpp
     node_search_test.cpp
     test_helpers.hpp
