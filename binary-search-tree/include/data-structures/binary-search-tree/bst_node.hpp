@@ -11,7 +11,9 @@
 /**
  * Direction of a descendant of a binary tree node.
  */
-enum class Direction : bool {kLeft, kRight};
+enum class Direction : bool {
+    kLeft, kRight
+};
 
 /**
  * Node of a binary search tree
@@ -67,6 +69,15 @@ public:
     }
 
     /**
+     * Disconnects the direct descendant node in the given direction.
+     *
+     * @param direction Direction
+     * @return Pointer to the disconnected node.
+     * @note Descendants of the disconnected node remain connected to the disconnected node.
+     */
+    NodePtr Disconnect(Direction direction);
+
+    /**
      * Removes the direct descendant node in the given direction and reconnects any descendants of the removed node.
      *
      * @param direction Indicates whether the left or the right direct descendant is to be removed.
@@ -104,7 +115,7 @@ BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
         return {nullptr, false};
     }
 
-    if(new_node->Key() == key_) {
+    if (new_node->Key() == key_) {
         return {this->shared_from_this(), false};
     }
 
@@ -116,7 +127,7 @@ BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
         return left_->Insert(std::move(new_node));
     }
 
-    if(!right_) {
+    if (!right_) {
         right_.swap(new_node);
         return {right_, true};
     }
@@ -147,15 +158,30 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) 
 }
 
 template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direction /*direction*/) {
-    // TODO: Implement
-    return BSTNode::NodePtr();
+typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direction direction) {
+    // Removed node with its descendants
+    auto removed_node = Disconnect(direction);
+    if (!removed_node) {
+        return nullptr;
+    }
+
+    Insert(removed_node->Disconnect(Direction::kLeft));
+    Insert(removed_node->Disconnect(Direction::kRight));
+
+    return removed_node;
 }
 
 template<typename TKey, typename TValue>
 std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TValue>::FindParent(TKey key) {
     // TODO: Implement
     return {nullptr, Direction::kLeft};
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Disconnect(Direction direction) {
+    NodePtr disconnected_node;
+    std::swap(disconnected_node, (direction == Direction::kLeft ? left_ : right_));
+    return disconnected_node;
 }
 
 #endif //BINARY_SEARCH_TREE_BST_NODE_HPP
