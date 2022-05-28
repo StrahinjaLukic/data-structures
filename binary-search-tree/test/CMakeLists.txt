@@ -1,5 +1,7 @@
 add_executable(${PROJECT_NAME}_unittest
-    bst_node_test.cpp
+    node_insertion_test.cpp
+    node_search_test.cpp
+    test_helpers.hpp
 )
 
 find_package(GTest CONFIG REQUIRED)
