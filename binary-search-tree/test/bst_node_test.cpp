@@ -7,15 +7,9 @@
 #include <gtest/gtest.h>
 
 #include <string>
-#include <memory>
 #include <map>
 
 namespace {
-    template<typename TKey, typename TValue>
-    typename BSTNode<TKey, TValue>::NodePtr MakeNode(TKey key, TValue value) {
-        return std::make_shared<BSTNode<TKey, TValue>>(key, value);
-    }
-
     template<typename TKey, typename TValue>
     typename BSTNode<TKey, TValue>::NodePtr
     MakeTree(const std::map<TKey, TValue> &key_values) {
@@ -23,10 +17,10 @@ namespace {
             return nullptr;
         }
 
-        auto root = MakeNode(key_values.begin()->first, key_values.begin()->second);
+        auto root = MakeBSTNode(key_values.begin()->first, key_values.begin()->second);
 
         for (auto it = std::next(key_values.begin()); it != key_values.end(); ++it) {
-            root->Insert(MakeNode(it->first, it->second));
+            root->Insert(MakeBSTNode(it->first, it->second));
         }
 
         return root;
@@ -36,15 +30,15 @@ namespace {
 TEST(BSTNodeTest, InsertNodesLeftAndRight) {
     using Node = BSTNode<int, std::string>;
 
-    auto root = MakeNode(0, std::string("root"));
+    auto root = MakeBSTNode(0, std::string("root"));
 
-    const auto right_insertion = root->Insert(MakeNode(1, std::string("right")));
+    const auto right_insertion = root->Insert(MakeBSTNode(1, std::string("right")));
     EXPECT_TRUE(right_insertion.second);
     ASSERT_TRUE(right_insertion.first);
     EXPECT_EQ(1, right_insertion.first->Key());
     EXPECT_EQ("right", right_insertion.first->Value());
 
-    const auto left_insertion = root->Insert(MakeNode(-1, std::string("left")));
+    const auto left_insertion = root->Insert(MakeBSTNode(-1, std::string("left")));
     EXPECT_TRUE(left_insertion.second);
     ASSERT_TRUE(left_insertion.first);
     EXPECT_EQ(-1, left_insertion.first->Key());
@@ -54,15 +48,15 @@ TEST(BSTNodeTest, InsertNodesLeftAndRight) {
 TEST(BSTNodeTest, AttemptInsertingExistingNode) {
     using Node = BSTNode<int, std::string>;
 
-    auto root = MakeNode(0, std::string("root"));
-    root->Insert(MakeNode(1, std::string("right")));
+    auto root = MakeBSTNode(0, std::string("root"));
+    root->Insert(MakeBSTNode(1, std::string("right")));
 
-    const auto root_overwrite = root->Insert(MakeNode(0, std::string("uproot")));
+    const auto root_overwrite = root->Insert(MakeBSTNode(0, std::string("uproot")));
     EXPECT_FALSE(root_overwrite.second);
     ASSERT_TRUE(root_overwrite.first);
     EXPECT_EQ("root", root_overwrite.first->Value());
 
-    const auto right_overwrite = root->Insert(MakeNode(1, std::string("outright")));
+    const auto right_overwrite = root->Insert(MakeBSTNode(1, std::string("outright")));
     EXPECT_FALSE(right_overwrite.second);
     ASSERT_TRUE(right_overwrite.first);
     EXPECT_EQ("right", right_overwrite.first->Value());
@@ -71,8 +65,8 @@ TEST(BSTNodeTest, AttemptInsertingExistingNode) {
 TEST(BSTNodeTest, AttemptInsertingNullNode) {
     using Node = BSTNode<int, std::string>;
 
-    auto root = MakeNode(0, std::string("root"));
-    root->Insert(MakeNode(1, std::string("right")));
+    auto root = MakeBSTNode(0, std::string("root"));
+    root->Insert(MakeBSTNode(1, std::string("right")));
 
     const auto null_insert = root->Insert(nullptr);
     EXPECT_FALSE(null_insert.second);
@@ -82,7 +76,7 @@ TEST(BSTNodeTest, AttemptInsertingNullNode) {
 TEST(BSTNodeTest, FindSelf) {
     using Node = BSTNode<int, std::string>;
 
-    auto root = MakeNode(0, std::string("root"));
+    auto root = MakeBSTNode(0, std::string("root"));
 
     const auto find_root = root->Find(root->Key());
     ASSERT_TRUE(find_root);

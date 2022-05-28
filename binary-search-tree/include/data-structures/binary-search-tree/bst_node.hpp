@@ -61,6 +61,11 @@ private:
 };
 
 template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::NodePtr MakeBSTNode(TKey key, TValue value) {
+    return std::make_shared<BSTNode<TKey, TValue>>(key, value);
+}
+
+template<typename TKey, typename TValue>
 std::pair<typename BSTNode<TKey, TValue>::NodePtr, bool>
 BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
     if (!new_node) {
