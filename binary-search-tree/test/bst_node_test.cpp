@@ -8,11 +8,28 @@
 
 #include <string>
 #include <memory>
+#include <map>
 
 namespace {
     template<typename TKey, typename TValue>
     typename BSTNode<TKey, TValue>::NodePtr MakeNode(TKey key, TValue value) {
         return std::make_shared<BSTNode<TKey, TValue>>(key, value);
+    }
+
+    template<typename TKey, typename TValue>
+    typename BSTNode<TKey, TValue>::NodePtr
+    MakeTree(const std::map<TKey, TValue> &key_values) {
+        if (key_values.empty()) {
+            return nullptr;
+        }
+
+        auto root = MakeNode(key_values.begin()->first, key_values.begin()->second);
+
+        for (auto it = std::next(key_values.begin()); it != key_values.end(); ++it) {
+            root->Insert(MakeNode(it->first, it->second));
+        }
+
+        return root;
     }
 }
 
@@ -60,4 +77,50 @@ TEST(BSTNodeTest, AttemptInsertingNullNode) {
     const auto null_insert = root->Insert(nullptr);
     EXPECT_FALSE(null_insert.second);
     EXPECT_FALSE(null_insert.first);
+}
+
+TEST(BSTNodeTest, FindSelf) {
+    using Node = BSTNode<int, std::string>;
+
+    auto root = MakeNode(0, std::string("root"));
+
+    const auto find_root = root->Find(root->Key());
+    ASSERT_TRUE(find_root);
+    ASSERT_EQ(root->Key(), find_root->Key());
+    ASSERT_EQ(root->Value(), find_root->Value());
+}
+
+TEST(BSTNodeTest, FindExistingNodes) {
+    using Node = BSTNode<int, std::string>;
+
+    const std::map<int, std::string> input = {
+            {0,  "root"},
+            {-1, "left"},
+            {1,  "right"},
+            {3,  "three"}
+    };
+
+    const auto root = MakeTree(input);
+
+    for (const auto &key_value : input) {
+        const auto found = root->Find(key_value.first);
+        ASSERT_TRUE(found);
+        EXPECT_EQ(key_value.first, found->Key());
+        EXPECT_EQ(key_value.second, found->Value());
+    }
+}
+
+TEST(BSTNodeTest, FindMissingNodes) {
+    using Node = BSTNode<int, std::string>;
+
+    const std::map<int, std::string> input = {
+            {0,  "root"},
+            {-1, "left"},
+            {1,  "right"},
+            {3,  "three"}
+    };
+
+    const auto root = MakeTree(input);
+
+    EXPECT_FALSE(root->Find(2));
 }

@@ -36,6 +36,14 @@ public:
      */
     std::pair<NodePtr, bool> Insert(NodePtr new_node);
 
+    /**
+     * Searches for the node with the given key.
+     *
+     * @param key Key to search for.
+     * @return NodePtr pointing to the requested node, or nullptr if the node with the requested key was not found.
+     */
+    NodePtr Find(TKey key);
+
     TKey Key() {
         return key_;
     }
@@ -76,6 +84,19 @@ BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
         return {right_, true};
     }
     return right_->Insert(std::move(new_node));
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Find(TKey key) {
+    if (key == key_) {
+        return this->shared_from_this();
+    }
+
+    if (key > key_) {
+        return right_ ? right_->Find(key) : nullptr;
+    }
+
+    return left_ ? left_->Find(key) : nullptr;
 }
 
 #endif //BINARY_SEARCH_TREE_BST_NODE_HPP
