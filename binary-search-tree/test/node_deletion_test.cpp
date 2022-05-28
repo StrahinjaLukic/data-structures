@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
-#include <map>
+#include <vector>
 
 TEST(RemoveNextTest, NextIsLeaf) {
     using Node = BSTNode<int, std::string>;
