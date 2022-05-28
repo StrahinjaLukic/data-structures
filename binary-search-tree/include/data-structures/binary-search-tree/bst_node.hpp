@@ -72,7 +72,7 @@ public:
      * Disconnects the direct descendant node in the given direction.
      *
      * @param direction Direction
-     * @return Pointer to the disconnected node.
+     * @return Pointer to the disconnected node, or nullptr if the descendant is not found.
      * @note Descendants of the disconnected node remain connected to the disconnected node.
      */
     NodePtr Disconnect(Direction direction);
@@ -81,7 +81,7 @@ public:
      * Removes the direct descendant node in the given direction and reconnects any descendants of the removed node.
      *
      * @param direction Indicates whether the left or the right direct descendant is to be removed.
-     * @return Pointer to the removed node, or nullptr if the descendant is not present;
+     * @return Pointer to the removed node, or nullptr if the descendant is not found
      */
     NodePtr RemoveNext(Direction direction);
 
