@@ -28,7 +28,7 @@ TEST(RemoveNextTest, NextIsLeaf) {
     EXPECT_EQ(-1, removed->Key());
     EXPECT_EQ("left", removed->Value());
 
-    for (const auto& key_value : input) {
+    for (const auto &key_value : input) {
         if (key_value.first == removed->Key()) {
             continue;
         }
@@ -56,7 +56,7 @@ TEST(RemoveNextTest, NextHasPosterity) {
     EXPECT_EQ(1, removed->Key());
     EXPECT_EQ("right", removed->Value());
 
-    for (const auto& key_value : input) {
+    for (const auto &key_value : input) {
         if (key_value.first == removed->Key()) {
             continue;
         }
@@ -65,19 +65,6 @@ TEST(RemoveNextTest, NextHasPosterity) {
         ASSERT_TRUE(found);
         EXPECT_EQ(key_value.second, found->Value());
     }
-}
-
-TEST(NodeDeletionTest, DeleteSelf_NoSuccess) {
-    using Node = BSTNode<int, std::string>;
-
-    constexpr auto kRootKey = 0;
-    const std::string kRootValue("root");
-    auto root = MakeBSTNode(kRootKey, kRootValue);
-
-    ASSERT_FALSE(root->Remove(root->Key()));
-    ASSERT_TRUE(root);
-    ASSERT_EQ(kRootKey, root->Key());
-    ASSERT_EQ(kRootValue, root->Value());
 }
 
 TEST(NodeDeletionTest, DeleteExistingNodes) {
@@ -114,4 +101,27 @@ TEST(NodeDeletionTest, DeleteNonExistingNode) {
     const auto root = MakeTree(input);
 
     EXPECT_FALSE(root->Remove(2));
+}
+
+TEST(NodeDeletionTest, DeleteRootNode_AnotherNodeBecomesRoot) {
+    using Node = BSTNode<int, std::string>;
+
+    const std::vector<std::pair<int, std::string>> input = {
+            {0,  "root"},
+            {-1, "left"},
+            {1,  "right"},
+            {3,  "three"}
+    };
+
+    const auto root = MakeTree(input);
+
+    const auto deletion_result = root->Remove(0);
+    ASSERT_TRUE(deletion_result);
+    EXPECT_EQ(0, deletion_result->Key());
+    EXPECT_EQ("root", deletion_result->Value());
+
+    ASSERT_TRUE(root);
+    EXPECT_TRUE(root->Find(-1));
+    EXPECT_TRUE(root->Find(1));
+    EXPECT_TRUE(root->Find(3));
 }

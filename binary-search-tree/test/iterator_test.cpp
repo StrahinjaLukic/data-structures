@@ -52,11 +52,12 @@ TEST_P(IteratorTest, VerifyOrder) {
     PerformOperations(*root, GetParam().operations);
     auto it = root->Begin();
 
-    for (const auto& expected : GetParam().expected_output) {
+    for (const auto &expected : GetParam().expected_output) {
         ASSERT_FALSE(it == root->End());
         EXPECT_EQ(expected.first, (*it).Key());
         EXPECT_EQ(expected.second, (*it).Value());
         ++it;
+        EXPECT_TRUE(root->Find(expected.first));
     }
 
     EXPECT_EQ(it, root->End());

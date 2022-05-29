@@ -188,6 +188,24 @@ std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TVal
 
 template<typename TKey, typename TValue>
 typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) {
+    if (key == key_) {
+        auto removed_node = MakeBSTNode(key_, value_);
+        if (left_) {
+            auto &&right = Disconnect(Direction::kRight);
+            key_ = left_->Key();
+            value_ = left_->Value();
+            right_ = left_->Right();
+            left_ = left_->Left();
+            Insert(std::move(right));
+        } else if (right_) {
+            key_ = right_->Key();
+            value_ = right_->Value();
+            left_ = right_->Left();
+            right_ = right_->Right();
+        }
+        return removed_node;
+    }
+
     const auto parent_and_direction = FindParent(key);
     if (!parent_and_direction.first) {
         return nullptr;
