@@ -5,6 +5,8 @@
 #ifndef BINARY_SEARCH_TREE_BST_NODE_HPP
 #define BINARY_SEARCH_TREE_BST_NODE_HPP
 
+#include "bt_iterator.hpp"
+
 #include <memory>
 #include <utility>
 
@@ -26,6 +28,8 @@ class BSTNode : public std::enable_shared_from_this<BSTNode<TKey, TValue>> {
 public:
     using NodeType = BSTNode<TKey, TValue>;
     using NodePtr = std::shared_ptr<NodeType>;
+    using ConstNodePtr = std::shared_ptr<const NodeType>;
+    using ConstIterator = BinaryTreeConstIterator<TKey, TValue>;
 
     BSTNode(TKey key, TValue value) :
             key_(key), value_(value) {}
@@ -77,6 +81,14 @@ public:
      */
     NodePtr Disconnect(Direction direction);
 
+    const NodePtr &Left() const {
+        return left_;
+    }
+
+    const NodePtr &Right() const {
+        return right_;
+    }
+
     /**
      * Removes the direct descendant node in the given direction and reconnects any descendants of the removed node.
      *
@@ -84,6 +96,10 @@ public:
      * @return Pointer to the removed node, or nullptr if the descendant is not found
      */
     NodePtr RemoveNext(Direction direction);
+
+    ConstIterator Begin() const;
+
+    ConstIterator End() const;
 
 private:
     /**
@@ -199,6 +215,19 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Disconnect(Direct
     NodePtr disconnected_node;
     std::swap(disconnected_node, (direction == Direction::kLeft ? left_ : right_));
     return disconnected_node;
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::ConstIterator BSTNode<TKey, TValue>::Begin() const {
+    std::stack<ConstNodePtr> parent_stack;
+    auto current = this->shared_from_this();
+    ConstIterator::WindLeft(current, parent_stack);
+    return BSTNode::ConstIterator(std::move(parent_stack), std::move(current));
+}
+
+template<typename TKey, typename TValue>
+typename BSTNode<TKey, TValue>::ConstIterator BSTNode<TKey, TValue>::End() const {
+    return BSTNode::ConstIterator(std::stack<ConstNodePtr>{}, nullptr);
 }
 
 #endif //BINARY_SEARCH_TREE_BST_NODE_HPP

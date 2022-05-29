@@ -3,6 +3,7 @@ add_executable(${PROJECT_NAME}_unittest
     node_insertion_test.cpp
     node_search_test.cpp
     test_helpers.hpp
+    iterator_test.cpp
 )
 
 find_package(GTest CONFIG REQUIRED)
