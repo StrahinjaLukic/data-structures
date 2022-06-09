@@ -78,6 +78,14 @@ INSTANTIATE_TEST_SUITE_P(OrderVerification, IteratorTest,
                                          {{5, "five"}, {6, "six"}, {8, "eight"}, {11, "eleven"}, {15, "fifteen"},
                                           {16, "sixteen"}},
                                          "RemoveNonExisting"
+                                 },
+                                 IteratorTestData{
+                                         {{10, "ten"}, {8, "eight"}, {7, "seven"}, {6, "six"}, {5, "five"}},
+                                         {{OperationType::kInsert, 11, "eleven"}, {OperationType::kRemove, 10, ""},
+                                          {OperationType::kInsert, 3, "three"}, {OperationType::kInsert, 4, "four"}},
+                                         {{3, "three"}, {4, "four"}, {5, "five"}, {6, "six"}, {7, "seven"},
+                                          {8, "eight"}, {11, "eleven"}},
+                                         "MostlyBackwards"
                                  }
                          ),
                          [](const testing::TestParamInfo<IteratorTest::ParamType> &info) {
