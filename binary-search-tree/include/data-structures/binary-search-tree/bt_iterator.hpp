@@ -12,10 +12,11 @@
 template<typename TKey, typename TValue>
 class BSTNode;
 
-template<typename TKey, typename TValue>
+template<typename... TArgs>
 class BinaryTreeConstIterator {
 public:
-    using NodeType = BSTNode<TKey, TValue>;
+    using ThisType = BinaryTreeConstIterator<TArgs...>;
+    using NodeType = BSTNode<TArgs...>;
     using ConstNodePtr = std::shared_ptr<const NodeType>;
 
     static void WindLeft(ConstNodePtr &node_ptr, std::stack<ConstNodePtr> &parent_stack) {
@@ -49,14 +50,14 @@ public:
         return *current_item_;
     }
 
-    bool operator==(const BinaryTreeConstIterator<TKey, TValue> &other) const {
+    bool operator==(const ThisType &other) const {
         return current_item_ == other.current_item_ &&
                parent_stack_.empty() == other.parent_stack_.empty() &&
                (parent_stack_.empty() ||
                 parent_stack_.top() == other.parent_stack_.top());
     }
 
-    bool operator!=(const BinaryTreeConstIterator<TKey, TValue> &other) const {
+    bool operator!=(const ThisType &other) const {
         return !(*this == other);
     }
 
@@ -65,7 +66,7 @@ private:
             parent_stack_(std::move(parent_stack)),
             current_item_(std::move(current_item)) {}
 
-    friend class BSTNode<TKey, TValue>;
+    friend NodeType;
 
     std::stack<ConstNodePtr> parent_stack_;
     ConstNodePtr current_item_;
