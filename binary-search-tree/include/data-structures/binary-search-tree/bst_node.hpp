@@ -23,13 +23,13 @@ enum class Direction : bool {
  * @tparam TKey key type
  * @tparam TValue value type
  */
-template<typename TKey, typename TValue>
-class BSTNode : public std::enable_shared_from_this<BSTNode<TKey, TValue>> {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+class BSTNode : public std::enable_shared_from_this<BSTNode<TKey, TValue, TUpdateStrategy>> {
 public:
-    using NodeType = BSTNode<TKey, TValue>;
+    using NodeType = BSTNode<TKey, TValue, TUpdateStrategy>;
     using NodePtr = std::shared_ptr<NodeType>;
     using ConstNodePtr = std::shared_ptr<const NodeType>;
-    using ConstIterator = BinaryTreeConstIterator<TKey, TValue>;
+    using ConstIterator = BinaryTreeConstIterator<TKey, TValue, TUpdateStrategy>;
 
     BSTNode(TKey key, TValue value) :
             key_(key), value_(value) {}
@@ -117,22 +117,24 @@ private:
 
     NodePtr left_;
     NodePtr right_;
+
+    friend TUpdateStrategy;
 };
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr MakeBSTNode(TKey key, TValue value) {
-    return std::make_shared<BSTNode<TKey, TValue>>(key, value);
+template<typename TUpdateStrategy, typename TKey, typename TValue>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr MakeBSTNode(TKey key, TValue value) {
+    return std::make_shared<BSTNode<TKey, TValue, TUpdateStrategy>>(key, value);
 }
 
-template<typename TKey, typename TValue>
-std::pair<typename BSTNode<TKey, TValue>::NodePtr, bool>
-BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, bool>
+BSTNode<TKey, TValue, TUpdateStrategy>::Insert(NodePtr new_node) {
     if (!new_node) {
         return {nullptr, false};
     }
 
     if (new_node->Key() == key_) {
-        return {this->shared_from_this(), false};
+        return TUpdateStrategy()(*this, std::move(*new_node));
     }
 
     if (new_node->Key() < key_) {
@@ -150,8 +152,8 @@ BSTNode<TKey, TValue>::Insert(NodePtr new_node) {
     return right_->Insert(std::move(new_node));
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Find(TKey key) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr BSTNode<TKey, TValue, TUpdateStrategy>::Find(TKey key) {
     if (key == key_) {
         return this->shared_from_this();
     }
@@ -163,8 +165,9 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Find(TKey key) {
     return left_ ? left_->Find(key) : nullptr;
 }
 
-template<typename TKey, typename TValue>
-std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TValue>::FindParent(TKey key) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, Direction>
+BSTNode<TKey, TValue, TUpdateStrategy>::FindParent(TKey key) {
     if (!left_ && !right_) {
         return {nullptr, Direction{}};
     }
@@ -186,10 +189,10 @@ std::pair<typename BSTNode<TKey, TValue>::NodePtr, Direction> BSTNode<TKey, TVal
     return {nullptr, Direction{}};
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr BSTNode<TKey, TValue, TUpdateStrategy>::Remove(TKey key) {
     if (key == key_) {
-        auto removed_node = MakeBSTNode(key_, value_);
+        auto removed_node = MakeBSTNode<TUpdateStrategy>(key_, value_);
         if (left_) {
             auto &&right = Disconnect(Direction::kRight);
             key_ = left_->Key();
@@ -214,8 +217,9 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Remove(TKey key) 
     return parent_and_direction.first->RemoveNext(parent_and_direction.second);
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direction direction) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
+BSTNode<TKey, TValue, TUpdateStrategy>::RemoveNext(Direction direction) {
     // Removed node with its descendants
     auto removed_node = Disconnect(direction);
     if (!removed_node) {
@@ -228,23 +232,24 @@ typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::RemoveNext(Direct
     return removed_node;
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::NodePtr BSTNode<TKey, TValue>::Disconnect(Direction direction) {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
+BSTNode<TKey, TValue, TUpdateStrategy>::Disconnect(Direction direction) {
     NodePtr disconnected_node;
     std::swap(disconnected_node, (direction == Direction::kLeft ? left_ : right_));
     return disconnected_node;
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::ConstIterator BSTNode<TKey, TValue>::Begin() const {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::ConstIterator BSTNode<TKey, TValue, TUpdateStrategy>::Begin() const {
     std::stack<ConstNodePtr> parent_stack;
     auto current = this->shared_from_this();
     ConstIterator::WindLeft(current, parent_stack);
     return BSTNode::ConstIterator(std::move(parent_stack), std::move(current));
 }
 
-template<typename TKey, typename TValue>
-typename BSTNode<TKey, TValue>::ConstIterator BSTNode<TKey, TValue>::End() const {
+template<typename TKey, typename TValue, typename TUpdateStrategy>
+typename BSTNode<TKey, TValue, TUpdateStrategy>::ConstIterator BSTNode<TKey, TValue, TUpdateStrategy>::End() const {
     return BSTNode::ConstIterator(std::stack<ConstNodePtr>{}, nullptr);
 }
 

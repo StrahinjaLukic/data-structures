@@ -3,6 +3,7 @@
 //
 
 #include <data-structures/binary-search-tree/bst_node.hpp>
+#include <data-structures/binary-search-tree/bt_update_strategies.hpp>
 
 #include "test_helpers.hpp"
 
@@ -17,7 +18,8 @@ namespace {
     };
     using KeyType = int;
     using ValueType = std::string;
-    using Node = BSTNode<KeyType, ValueType>;
+    using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
+    using Node = BSTNode<KeyType, ValueType, UpdateStrategy>;
 
     struct Operation {
         OperationType type;
@@ -38,7 +40,7 @@ protected:
     static void PerformOperations(Node &root, const std::vector<Operation> &operations) {
         for (const auto &operation: operations) {
             if (operation.type == OperationType::kInsert) {
-                root.Insert(MakeBSTNode(operation.key, operation.value));
+                root.Insert(MakeBSTNode<UpdateStrategy>(operation.key, operation.value));
             } else {
                 root.Remove(operation.key);
             }
@@ -47,7 +49,7 @@ protected:
 };
 
 TEST_P(IteratorTest, VerifyOrder) {
-    auto root = MakeTree(GetParam().initial_input);
+    auto root = MakeTree<UpdateStrategy>(GetParam().initial_input);
     ASSERT_TRUE(root);
     PerformOperations(*root, GetParam().operations);
     auto it = root->Begin();

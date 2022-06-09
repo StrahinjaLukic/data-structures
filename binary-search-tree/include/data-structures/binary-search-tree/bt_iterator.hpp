@@ -9,7 +9,7 @@
 #include <utility>
 #include <stack>
 
-template<typename TKey, typename TValue>
+template<typename TKey, typename TValue, typename TUpdateStrategy>
 class BSTNode;
 
 template<typename... TArgs>

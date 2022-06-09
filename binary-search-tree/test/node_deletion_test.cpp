@@ -11,9 +11,24 @@
 #include <string>
 #include <vector>
 
-TEST(RemoveNextTest, NextIsLeaf) {
-    using Node = BSTNode<int, std::string>;
+namespace {
+    template<typename... TArgs>
+    class DummyUpdateStrategy {
+        using Node = BSTNode<TArgs..., DummyUpdateStrategy<TArgs...>>;
+        using NodePtr = typename Node::NodePtr;
+    public:
+        std::pair<NodePtr, bool> operator()(Node& /* this_node */, Node&& /* new_node */) {
+            return {nullptr, false};
+        }
+    };
 
+    using KeyType = int;
+    using ValueType = std::string;
+    using UpdateStrategy = DummyUpdateStrategy<KeyType, ValueType>;
+    using Node = BSTNode<int, std::string, UpdateStrategy>;
+}
+
+TEST(RemoveNextTest, NextIsLeaf) {
     const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
@@ -21,7 +36,7 @@ TEST(RemoveNextTest, NextIsLeaf) {
             {3,  "three"}
     };
 
-    const auto root = MakeTree(input);
+    const auto root = MakeTree<UpdateStrategy>(input);
 
     const auto removed = root->RemoveNext(Direction::kLeft);
     ASSERT_TRUE(removed);
@@ -40,8 +55,6 @@ TEST(RemoveNextTest, NextIsLeaf) {
 }
 
 TEST(RemoveNextTest, NextHasPosterity) {
-    using Node = BSTNode<int, std::string>;
-
     const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
@@ -49,7 +62,7 @@ TEST(RemoveNextTest, NextHasPosterity) {
             {3,  "three"}
     };
 
-    const auto root = MakeTree(input);
+    const auto root = MakeTree<UpdateStrategy>(input);
 
     const auto removed = root->RemoveNext(Direction::kRight);
     ASSERT_TRUE(removed);
@@ -68,8 +81,6 @@ TEST(RemoveNextTest, NextHasPosterity) {
 }
 
 TEST(NodeDeletionTest, DeleteExistingNodes) {
-    using Node = BSTNode<int, std::string>;
-
     const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
@@ -77,7 +88,7 @@ TEST(NodeDeletionTest, DeleteExistingNodes) {
             {3,  "three"}
     };
 
-    const auto root = MakeTree(input);
+    const auto root = MakeTree<UpdateStrategy>(input);
 
     for (auto it = std::next(input.begin()); it != input.end(); ++it) {
         const auto deletion_result = root->Remove(it->first);
@@ -89,8 +100,6 @@ TEST(NodeDeletionTest, DeleteExistingNodes) {
 }
 
 TEST(NodeDeletionTest, DeleteNonExistingNode) {
-    using Node = BSTNode<int, std::string>;
-
     const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
@@ -98,14 +107,12 @@ TEST(NodeDeletionTest, DeleteNonExistingNode) {
             {3,  "three"}
     };
 
-    const auto root = MakeTree(input);
+    const auto root = MakeTree<UpdateStrategy>(input);
 
     EXPECT_FALSE(root->Remove(2));
 }
 
 TEST(NodeDeletionTest, DeleteRootNode_AnotherNodeBecomesRoot) {
-    using Node = BSTNode<int, std::string>;
-
     const std::vector<std::pair<int, std::string>> input = {
             {0,  "root"},
             {-1, "left"},
@@ -113,7 +120,7 @@ TEST(NodeDeletionTest, DeleteRootNode_AnotherNodeBecomesRoot) {
             {3,  "three"}
     };
 
-    const auto root = MakeTree(input);
+    const auto root = MakeTree<UpdateStrategy>(input);
 
     const auto deletion_result = root->Remove(0);
     ASSERT_TRUE(deletion_result);
