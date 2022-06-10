@@ -11,23 +11,28 @@
 #include <string>
 #include <vector>
 
-namespace {
-    template<typename... TArgs>
-    class DummyUpdateStrategy {
-        using Node = BSTNode<TArgs..., DummyUpdateStrategy<TArgs...>>;
-        using NodePtr = typename Node::NodePtr;
-    public:
-        std::pair<NodePtr, bool> operator()(Node& /* this_node */, Node&& /* new_node */) {
-            return {nullptr, false};
-        }
-    };
+namespace
+{
+template <typename... TArgs>
+class DummyUpdateStrategy
+{
+    using Node = BSTNode<TArgs..., DummyUpdateStrategy<TArgs...>>;
+    using NodePtr = typename Node::NodePtr;
 
-    using KeyType = int;
-    using ValueType = std::string;
-    using UpdateStrategy = DummyUpdateStrategy<KeyType, ValueType>;
-}
+public:
+    std::pair<NodePtr, bool> operator()(Node& /* this_node */, Node&& /* new_node */)
+    {
+        return {nullptr, false};
+    }
+};
 
-TEST(NodeSearchTest, FindSelf) {
+using KeyType = int;
+using ValueType = std::string;
+using UpdateStrategy = DummyUpdateStrategy<KeyType, ValueType>;
+}  // namespace
+
+TEST(NodeSearchTest, FindSelf)
+{
     auto root = MakeBSTNode<UpdateStrategy>(0, std::string("root"));
 
     const auto find_root = root->Find(root->Key());
@@ -36,17 +41,15 @@ TEST(NodeSearchTest, FindSelf) {
     ASSERT_EQ(root->Value(), find_root->Value());
 }
 
-TEST(NodeSearchTest, FindExistingNodes) {
+TEST(NodeSearchTest, FindExistingNodes)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 
-    for (const auto &key_value : input) {
+    for (const auto& key_value : input)
+    {
         const auto found = root->Find(key_value.first);
         ASSERT_TRUE(found);
         EXPECT_EQ(key_value.first, found->Key());
@@ -54,13 +57,10 @@ TEST(NodeSearchTest, FindExistingNodes) {
     }
 }
 
-TEST(NodeSearchTest, FindMissingNodes) {
+TEST(NodeSearchTest, FindMissingNodes)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 

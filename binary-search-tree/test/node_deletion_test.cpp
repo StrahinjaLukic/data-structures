@@ -11,30 +11,31 @@
 #include <string>
 #include <vector>
 
-namespace {
-    template<typename... TArgs>
-    class DummyUpdateStrategy {
-        using Node = BSTNode<TArgs..., DummyUpdateStrategy<TArgs...>>;
-        using NodePtr = typename Node::NodePtr;
-    public:
-        std::pair<NodePtr, bool> operator()(Node& /* this_node */, Node&& /* new_node */) {
-            return {nullptr, false};
-        }
-    };
+namespace
+{
+template <typename... TArgs>
+class DummyUpdateStrategy
+{
+    using Node = BSTNode<TArgs..., DummyUpdateStrategy<TArgs...>>;
+    using NodePtr = typename Node::NodePtr;
 
-    using KeyType = int;
-    using ValueType = std::string;
-    using UpdateStrategy = DummyUpdateStrategy<KeyType, ValueType>;
-    using Node = BSTNode<int, std::string, UpdateStrategy>;
-}
+public:
+    std::pair<NodePtr, bool> operator()(Node& /* this_node */, Node&& /* new_node */)
+    {
+        return {nullptr, false};
+    }
+};
 
-TEST(RemoveNextTest, NextIsLeaf) {
+using KeyType = int;
+using ValueType = std::string;
+using UpdateStrategy = DummyUpdateStrategy<KeyType, ValueType>;
+using Node = BSTNode<int, std::string, UpdateStrategy>;
+}  // namespace
+
+TEST(RemoveNextTest, NextIsLeaf)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 
@@ -43,8 +44,10 @@ TEST(RemoveNextTest, NextIsLeaf) {
     EXPECT_EQ(-1, removed->Key());
     EXPECT_EQ("left", removed->Value());
 
-    for (const auto &key_value : input) {
-        if (key_value.first == removed->Key()) {
+    for (const auto& key_value : input)
+    {
+        if (key_value.first == removed->Key())
+        {
             continue;
         }
 
@@ -54,13 +57,10 @@ TEST(RemoveNextTest, NextIsLeaf) {
     }
 }
 
-TEST(RemoveNextTest, NextHasPosterity) {
+TEST(RemoveNextTest, NextHasPosterity)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 
@@ -69,8 +69,10 @@ TEST(RemoveNextTest, NextHasPosterity) {
     EXPECT_EQ(1, removed->Key());
     EXPECT_EQ("right", removed->Value());
 
-    for (const auto &key_value : input) {
-        if (key_value.first == removed->Key()) {
+    for (const auto& key_value : input)
+    {
+        if (key_value.first == removed->Key())
+        {
             continue;
         }
 
@@ -80,17 +82,15 @@ TEST(RemoveNextTest, NextHasPosterity) {
     }
 }
 
-TEST(NodeDeletionTest, DeleteExistingNodes) {
+TEST(NodeDeletionTest, DeleteExistingNodes)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 
-    for (auto it = std::next(input.begin()); it != input.end(); ++it) {
+    for (auto it = std::next(input.begin()); it != input.end(); ++it)
+    {
         const auto deletion_result = root->Remove(it->first);
         ASSERT_TRUE(deletion_result);
         EXPECT_EQ(it->first, deletion_result->Key());
@@ -99,26 +99,20 @@ TEST(NodeDeletionTest, DeleteExistingNodes) {
     }
 }
 
-TEST(NodeDeletionTest, DeleteNonExistingNode) {
+TEST(NodeDeletionTest, DeleteNonExistingNode)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 
     EXPECT_FALSE(root->Remove(2));
 }
 
-TEST(NodeDeletionTest, DeleteRootNode_AnotherNodeBecomesRoot) {
+TEST(NodeDeletionTest, DeleteRootNode_AnotherNodeBecomesRoot)
+{
     const std::vector<std::pair<int, std::string>> input = {
-            {0,  "root"},
-            {-1, "left"},
-            {1,  "right"},
-            {3,  "three"}
-    };
+        {0, "root"}, {-1, "left"}, {1, "right"}, {3, "three"}};
 
     const auto root = MakeTree<UpdateStrategy>(input);
 

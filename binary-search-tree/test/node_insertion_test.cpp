@@ -9,12 +9,14 @@
 
 #include <string>
 
-namespace {
-    using KeyType = int;
-    using ValueType = std::string;
-}
+namespace
+{
+using KeyType = int;
+using ValueType = std::string;
+}  // namespace
 
-TEST(NodeInsertionTest, InsertNodesLeftAndRight) {
+TEST(NodeInsertionTest, InsertNodesLeftAndRight)
+{
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
     const auto node_maker = [](KeyType key, ValueType value) {
         return MakeBSTNode<UpdateStrategy>(key, value);
@@ -35,7 +37,8 @@ TEST(NodeInsertionTest, InsertNodesLeftAndRight) {
     EXPECT_EQ("left", left_insertion.first->Value());
 }
 
-TEST(NodeInsertionTest, UpdateStrategyReject_InsertingExistingNodeFails) {
+TEST(NodeInsertionTest, UpdateStrategyReject_InsertingExistingNodeFails)
+{
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
     const auto node_maker = [](KeyType key, ValueType value) {
         return MakeBSTNode<UpdateStrategy>(key, value);
@@ -55,7 +58,8 @@ TEST(NodeInsertionTest, UpdateStrategyReject_InsertingExistingNodeFails) {
     EXPECT_EQ("right", right_overwrite.first->Value());
 }
 
-TEST(NodeInsertionTest, UpdateStrategyAccept_InsertingExistingNodeSucceeds) {
+TEST(NodeInsertionTest, UpdateStrategyAccept_InsertingExistingNodeSucceeds)
+{
     using UpdateStrategy = AcceptUpdates<KeyType, ValueType>;
     const auto node_maker = [](KeyType key, ValueType value) {
         return MakeBSTNode<UpdateStrategy>(key, value);
@@ -80,7 +84,8 @@ TEST(NodeInsertionTest, UpdateStrategyAccept_InsertingExistingNodeSucceeds) {
     EXPECT_EQ("outright", replaced_node->Value());
 }
 
-TEST(NodeInsertionTest, InsertingNullNodeFails) {
+TEST(NodeInsertionTest, InsertingNullNodeFails)
+{
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
     const auto node_maker = [](KeyType key, ValueType value) {
         return MakeBSTNode<UpdateStrategy>(key, value);
