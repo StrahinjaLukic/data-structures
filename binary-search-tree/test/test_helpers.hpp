@@ -4,10 +4,11 @@
 
 #include <data-structures/binary-search-tree/bst_node.hpp>
 
+#include <concepts>
 #include <utility>
 #include <vector>
 
-template <typename TUpdateStrategy, typename TKey, typename TValue>
+template <typename TUpdateStrategy, std::totally_ordered TKey, typename TValue>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr MakeTree(
     const std::vector<std::pair<TKey, TValue>>& key_values)
 {

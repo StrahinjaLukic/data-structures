@@ -5,11 +5,12 @@
 #ifndef BINARY_TREE_BT_ITERATOR_HPP
 #define BINARY_TREE_BT_ITERATOR_HPP
 
+#include <concepts>
 #include <memory>
 #include <stack>
 #include <utility>
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 class BSTNode;
 
 template <typename... TArgs>

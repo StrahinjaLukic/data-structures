@@ -7,6 +7,7 @@
 
 #include "bt_iterator.hpp"
 
+#include <concepts>
 #include <memory>
 #include <utility>
 
@@ -25,7 +26,7 @@ enum class Direction : bool
  * @tparam TKey key type
  * @tparam TValue value type
  */
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 class BSTNode : public std::enable_shared_from_this<BSTNode<TKey, TValue, TUpdateStrategy>>
 {
 public:
@@ -131,13 +132,13 @@ private:
     friend TUpdateStrategy;
 };
 
-template <typename TUpdateStrategy, typename TKey, typename TValue>
+template <typename TUpdateStrategy, std::totally_ordered TKey, typename TValue>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr MakeBSTNode(TKey key, TValue value)
 {
     return std::make_shared<BSTNode<TKey, TValue, TUpdateStrategy>>(key, value);
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, bool>
 BSTNode<TKey, TValue, TUpdateStrategy>::Insert(NodePtr new_node)
 {
@@ -169,7 +170,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Insert(NodePtr new_node)
     return right_->Insert(std::move(new_node));
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
 BSTNode<TKey, TValue, TUpdateStrategy>::Find(TKey key)
 {
@@ -186,7 +187,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Find(TKey key)
     return left_ ? left_->Find(key) : nullptr;
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, Direction>
 BSTNode<TKey, TValue, TUpdateStrategy>::FindParent(TKey key)
 {
@@ -217,7 +218,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::FindParent(TKey key)
     return {nullptr, Direction{}};
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
 BSTNode<TKey, TValue, TUpdateStrategy>::Remove(TKey key)
 {
@@ -252,7 +253,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Remove(TKey key)
     return parent_and_direction.first->RemoveNext(parent_and_direction.second);
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
 BSTNode<TKey, TValue, TUpdateStrategy>::RemoveNext(Direction direction)
 {
@@ -269,7 +270,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::RemoveNext(Direction direction)
     return removed_node;
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr
 BSTNode<TKey, TValue, TUpdateStrategy>::Disconnect(Direction direction)
 {
@@ -278,7 +279,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Disconnect(Direction direction)
     return disconnected_node;
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::ConstIterator
 BSTNode<TKey, TValue, TUpdateStrategy>::Begin() const
 {
@@ -288,7 +289,7 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Begin() const
     return BSTNode::ConstIterator(std::move(parent_stack), std::move(current));
 }
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 typename BSTNode<TKey, TValue, TUpdateStrategy>::ConstIterator
 BSTNode<TKey, TValue, TUpdateStrategy>::End() const
 {

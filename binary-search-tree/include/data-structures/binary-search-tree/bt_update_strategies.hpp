@@ -5,9 +5,10 @@
 #ifndef BINARY_SEARCH_TREE_BT_UPDATE_STRATEGIES_HPP
 #define BINARY_SEARCH_TREE_BT_UPDATE_STRATEGIES_HPP
 
+#include <concepts>
 #include <utility>
 
-template <typename TKey, typename TValue, typename TUpdateStrategy>
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 class BSTNode;
 
 template <typename... TArgs>
