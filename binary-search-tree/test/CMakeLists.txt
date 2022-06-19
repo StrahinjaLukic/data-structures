@@ -16,3 +16,5 @@ add_test(
 )
 
 set_tests_properties(${PROJECT_NAME}_unittest PROPERTIES TIMEOUT 60)
+
+add_subdirectory(static)

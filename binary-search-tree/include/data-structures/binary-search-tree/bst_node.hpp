@@ -5,6 +5,7 @@
 #ifndef BINARY_SEARCH_TREE_BST_NODE_HPP
 #define BINARY_SEARCH_TREE_BST_NODE_HPP
 
+#include "bt_concepts.hpp"
 #include "bt_iterator.hpp"
 
 #include <concepts>
@@ -49,7 +50,8 @@ public:
      *  - Nullptr if new_node is nullptr.
      *  The boolean is true if the new node was successfully inserted, false otherwise.
      */
-    std::pair<NodePtr, bool> Insert(NodePtr new_node);
+    std::pair<NodePtr, bool> Insert(
+        NodePtr new_node) requires CallableWithUpdateSignature<TUpdateStrategy, NodeType>;
 
     /**
      * Searches for the node with the given key.
@@ -140,7 +142,8 @@ typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr MakeBSTNode(TKey key, T
 
 template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
 std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, bool>
-BSTNode<TKey, TValue, TUpdateStrategy>::Insert(NodePtr new_node)
+BSTNode<TKey, TValue, TUpdateStrategy>::Insert(
+    NodePtr new_node) requires CallableWithUpdateSignature<TUpdateStrategy, NodeType>
 {
     if (!new_node)
     {
