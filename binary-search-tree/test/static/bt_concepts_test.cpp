@@ -2,7 +2,7 @@
 // Created by strahinja on 6/19/22.
 //
 
-#include <data-structures/binary-search-tree/bt_concepts.hpp>
+#include <data-structures/concepts/bt_concepts.hpp>
 
 namespace
 {

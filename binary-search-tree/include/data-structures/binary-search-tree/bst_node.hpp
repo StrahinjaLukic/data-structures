@@ -5,7 +5,8 @@
 #ifndef BINARY_SEARCH_TREE_BST_NODE_HPP
 #define BINARY_SEARCH_TREE_BST_NODE_HPP
 
-#include "bt_concepts.hpp"
+#include <data-structures/concepts/bt_concepts.hpp>
+
 #include "bt_iterator.hpp"
 
 #include <concepts>
