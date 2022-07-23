@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(concepts)
 add_subdirectory(binary-search-tree)
+add_subdirectory(sstable-logger)
