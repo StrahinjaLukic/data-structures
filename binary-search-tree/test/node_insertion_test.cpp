@@ -18,19 +18,16 @@ using ValueType = std::string;
 TEST(NodeInsertionTest, InsertNodesLeftAndRight)
 {
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
-    const auto node_maker = [](KeyType key, ValueType value) {
-        return MakeBSTNode<UpdateStrategy>(key, value);
-    };
 
-    auto root = node_maker(0, std::string("root"));
+    auto root = MakeBSTNode<UpdateStrategy>(0, std::string("root"));
 
-    const auto right_insertion = root->Insert(node_maker(1, std::string("right")));
+    const auto right_insertion = root->Insert(1, "right");
     EXPECT_TRUE(right_insertion.second);
     ASSERT_TRUE(right_insertion.first);
     EXPECT_EQ(1, right_insertion.first->Key());
     EXPECT_EQ("right", right_insertion.first->Value());
 
-    const auto left_insertion = root->Insert(node_maker(-1, std::string("left")));
+    const auto left_insertion = root->Insert(-1, "left");
     EXPECT_TRUE(left_insertion.second);
     ASSERT_TRUE(left_insertion.first);
     EXPECT_EQ(-1, left_insertion.first->Key());
@@ -40,19 +37,16 @@ TEST(NodeInsertionTest, InsertNodesLeftAndRight)
 TEST(NodeInsertionTest, UpdateStrategyReject_InsertingExistingNodeFails)
 {
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
-    const auto node_maker = [](KeyType key, ValueType value) {
-        return MakeBSTNode<UpdateStrategy>(key, value);
-    };
 
-    auto root = node_maker(0, std::string("root"));
-    root->Insert(node_maker(1, std::string("right")));
+    auto root = MakeBSTNode<UpdateStrategy>(0, std::string("root"));
+    root->Insert(1, "right");
 
-    const auto root_overwrite = root->Insert(node_maker(0, std::string("uproot")));
+    const auto root_overwrite = root->Insert(0, "uproot");
     EXPECT_FALSE(root_overwrite.second);
     ASSERT_TRUE(root_overwrite.first);
     EXPECT_EQ("root", root_overwrite.first->Value());
 
-    const auto right_overwrite = root->Insert(node_maker(1, std::string("outright")));
+    const auto right_overwrite = root->Insert(1, "outright");
     EXPECT_FALSE(right_overwrite.second);
     ASSERT_TRUE(right_overwrite.first);
     EXPECT_EQ("right", right_overwrite.first->Value());
@@ -61,21 +55,18 @@ TEST(NodeInsertionTest, UpdateStrategyReject_InsertingExistingNodeFails)
 TEST(NodeInsertionTest, UpdateStrategyAccept_InsertingExistingNodeSucceeds)
 {
     using UpdateStrategy = AcceptUpdates<KeyType, ValueType>;
-    const auto node_maker = [](KeyType key, ValueType value) {
-        return MakeBSTNode<UpdateStrategy>(key, value);
-    };
 
-    auto root = node_maker(0, std::string("root"));
-    root->Insert(node_maker(1, std::string("right")));
+    auto root = MakeBSTNode<UpdateStrategy>(0, std::string("root"));
+    root->Insert(1, "right");
 
-    const auto root_overwrite = root->Insert(node_maker(0, std::string("uproot")));
+    const auto root_overwrite = root->Insert(0, "uproot");
     EXPECT_TRUE(root_overwrite.second);
     ASSERT_TRUE(root_overwrite.first);
     EXPECT_EQ("uproot", root_overwrite.first->Value());
     EXPECT_EQ(root, root_overwrite.first);
     EXPECT_TRUE(root_overwrite.first->Find(1));
 
-    const auto right_overwrite = root->Insert(node_maker(1, std::string("outright")));
+    const auto right_overwrite = root->Insert(1, "outright");
     EXPECT_TRUE(right_overwrite.second);
     ASSERT_TRUE(right_overwrite.first);
     EXPECT_EQ("outright", right_overwrite.first->Value());
@@ -87,12 +78,9 @@ TEST(NodeInsertionTest, UpdateStrategyAccept_InsertingExistingNodeSucceeds)
 TEST(NodeInsertionTest, InsertingNullNodeFails)
 {
     using UpdateStrategy = RejectUpdates<KeyType, ValueType>;
-    const auto node_maker = [](KeyType key, ValueType value) {
-        return MakeBSTNode<UpdateStrategy>(key, value);
-    };
 
-    auto root = node_maker(0, std::string("root"));
-    root->Insert(node_maker(1, std::string("right")));
+    auto root = MakeBSTNode<UpdateStrategy>(0, std::string("root"));
+    root->Insert(1, "right");
 
     const auto null_insert = root->Insert(nullptr);
     EXPECT_FALSE(null_insert.second);

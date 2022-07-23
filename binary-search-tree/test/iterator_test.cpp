@@ -49,7 +49,7 @@ protected:
         {
             if (operation.type == OperationType::kInsert)
             {
-                root.Insert(MakeBSTNode<UpdateStrategy>(operation.key, operation.value));
+                root.Insert(operation.key, operation.value);
             }
             else
             {

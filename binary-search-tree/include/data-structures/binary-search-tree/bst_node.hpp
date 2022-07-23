@@ -54,6 +54,21 @@ public:
         NodePtr new_node) requires CallableWithUpdateSignature<TUpdateStrategy, NodeType>;
 
     /**
+     * Inserts a new node with the specified key and value,
+     * if the tree does not already contain a node with the same key.
+     *
+     * @param key Key of the new node.
+     * @param value Value of the new node.
+     * @return a pair consisting of an pointer and a boolean. The pointer points:
+     *  - To the inserted element if the insertion took place.
+     *  - To the element that prevented the insertion if tree already contains a node with the same
+     * key.
+     *  The boolean is true if the new node was successfully inserted, false otherwise.
+     */
+    std::pair<NodePtr, bool> Insert(
+        TKey key, TValue value) requires CallableWithUpdateSignature<TUpdateStrategy, NodeType>;
+
+    /**
      * Searches for the node with the given key.
      *
      * @param key Key to search for.
@@ -171,6 +186,14 @@ BSTNode<TKey, TValue, TUpdateStrategy>::Insert(
         return {right_, true};
     }
     return right_->Insert(std::move(new_node));
+}
+
+template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
+std::pair<typename BSTNode<TKey, TValue, TUpdateStrategy>::NodePtr, bool>
+BSTNode<TKey, TValue, TUpdateStrategy>::Insert(
+    TKey key, TValue value) requires CallableWithUpdateSignature<TUpdateStrategy, NodeType>
+{
+    return Insert(MakeBSTNode<TUpdateStrategy, TKey, TValue>(key, value));
 }
 
 template <std::totally_ordered TKey, typename TValue, typename TUpdateStrategy>
